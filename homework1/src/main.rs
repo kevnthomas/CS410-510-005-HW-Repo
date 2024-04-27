@@ -1,3 +1,7 @@
+//Kevin Thomas main.rs
+//Implementing AXUM version
+
+use axum::{Router, routing::get};
 use warp::{http::Method, Filter};
 
 mod error;
@@ -11,6 +15,20 @@ use crate::handlers::{
 use crate::faux_db::Store;
 
 #[tokio::main]
+//AXUM Implementation
+async fn main(){
+    let store = Store::new();
+    let store_filter = warp::any().map(move || store.clone());
+
+    fn init_router() -> {
+        Router::new()
+            .route("/", get(get_questions))
+    }
+
+}
+
+//Base Implmentation
+/*
 async fn main() {
     //fake database
     let store = Store::new();
@@ -69,3 +87,4 @@ async fn main() {
 
     //use path::end to signal listening on exactly /question, and not /question/.../
 }
+*/
