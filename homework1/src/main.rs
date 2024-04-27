@@ -1,18 +1,22 @@
 //Kevin Thomas main.rs
 //Implementing AXUM version
 
-use axum::{Router, routing::get};
+use std::net::SocketAddr;
+use axum::{Router, routing::get, routing::post, response::IntoResponse, response::Response, http::StatusCode};
+use axum::extract::{path, Extension, Path, State};
 use warp::{http::Method, Filter};
 
 mod error;
 mod handlers;
 mod faux_db;
 mod question;
+mod axum_helpers;
 
 use crate::handlers::{
-    add_questions, delete_question, get_questions, return_error, update_question,
+    add_questions, delete_question, get_questions, return_error, update_question, get_questions_axum
 };
 use crate::faux_db::Store;
+use crate::axum_helpers::{ApiResponse, IntoResponse}
 
 #[tokio::main]
 //AXUM Implementation
@@ -20,11 +24,17 @@ async fn main(){
     let store = Store::new();
     let store_filter = warp::any().map(move || store.clone());
 
-    fn init_router() -> {
-        Router::new()
-            .route("/", get(get_questions))
-    }
+    //set up routes
+    let question_app = Router::new()
+        .route("/questions", get(get_questions_axum(store)));
 
+    //define addr
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3030));
+    println!("validate addr {}", addr);
+
+    //run server
+    let axum_server = tokio::net::TcpListener::bind(addr).await?;
+    axum::serve(axum_server, question_app).await?;
 }
 
 //Base Implmentation

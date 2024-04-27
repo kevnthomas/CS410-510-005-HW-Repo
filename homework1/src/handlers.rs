@@ -9,6 +9,11 @@ use crate::question::{Question, QuestionId};
 pub struct InvalidId;
 impl Reject for InvalidId {}
 
+//get questions axum version
+pub async fn get_questions_axum() -> Result<ApiResponse, ApiError> {
+
+}
+
 //route handler for create questions
 pub async fn get_questions(
     params: HashMap<String, String>,
